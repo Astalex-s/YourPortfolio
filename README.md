@@ -11,7 +11,7 @@
 | `/` | Главная — Hero секция |
 | `/about/` | О себе + Навыки |
 | `/services/` | Услуги |
-| `/resume/` | Резюме (образование + опыт) |
+| `/resume/` | Резюме (образование + опыт работы) |
 | `/portfolio/` | Портфолио (сетка проектов) |
 | `/portfolio/<slug>/` | Детальная страница проекта |
 | `/contact/` | Форма обратной связи |
@@ -22,7 +22,8 @@
 ## Быстрый старт
 
 ```bash
-# 1. Клонировать и войти в папку
+# 1. Клонировать репозиторий
+git clone https://github.com/Astalex-s/YourPortfolio.git
 cd YourPortfolio
 
 # 2. Создать виртуальное окружение
@@ -30,33 +31,31 @@ python -m venv .venv
 .venv\Scripts\activate          # Windows
 # source .venv/bin/activate     # Linux/Mac
 
-# 3. Обновить pip (важно — иначе Pillow не установится)
+# 3. Обновить pip
 python -m pip install --upgrade pip
 
 # 4. Установить зависимости
 pip install -r requirements/local.txt
 
-# 4. Создать .env файл (скопировать из примера)
-cp .env.example .env            # если есть
-# или создать вручную (см. раздел «Переменные окружения»)
+# 5. Создать .env файл
+cp .env.example .env
+# Отредактируйте .env (см. раздел «Переменные окружения»)
 
-# 5. Применить миграции
+# 6. Применить миграции
 python manage.py migrate
 
-# 6. Создать суперпользователя
+# 7. Создать суперпользователя
 python manage.py createsuperuser
 
-# 7. Запустить сервер
+# 8. Запустить сервер
 python manage.py runserver
 ```
 
-Сайт будет доступен по адресу: http://127.0.0.1:8000/
+Сайт: http://127.0.0.1:8000/ — Админ-панель: http://127.0.0.1:8000/admin/
 
 ---
 
 ## Переменные окружения (.env)
-
-Создайте файл `.env` в корне проекта:
 
 ```env
 SECRET_KEY=your-secret-key-here
@@ -69,100 +68,124 @@ DEFAULT_FROM_EMAIL=noreply@yoursite.com
 
 ---
 
-## Наполнение сайта через Админ-панель
+## Наполнение через Админ-панель
 
-Перейдите на http://127.0.0.1:8000/admin/ и заполните:
-### 1. Настройки сайта (SiteSettings)
-Раздел **Pages → Настройки сайта** — единственная запись, Singleton.
+### 1. Настройки сайта (Pages → Настройки сайта)
+
+Singleton-запись, одна на весь сайт.
 
 | Поле | Описание |
 |------|----------|
-| `owner_name` | Ваше имя (отображается в логотипе, Hero, About) |
-| `tagline` | Должность / слоган (например: «Backend Developer») |
+| `owner_name` | Ваше имя |
+| `tagline` | Должность / слоган |
 | `about_text` | Текст блока «О себе» |
-| `avatar` | Фото (рекомендуемое соотношение 3:4) |
+| `avatar` | Фото на главной (рекомендуется 3:4) |
+| `about_photo` | Фото на странице «Обо мне» |
+| `logo` | Логотип в шапке и подвале |
 | `email` | Контактный email |
-| `phone` | Телефон (отображается в шапке) |
+| `phone` | Телефон |
 | `location` | Город / страна |
+| `birth_date` | Дата рождения |
 | `resume_pdf` | PDF резюме для скачивания |
 | `meta_description` | SEO-описание |
-| `cv_data` | JSON с данными CV (см. ниже) |
 
-### 2. Формат cv_data (JSON)
+### 2. Образование (Pages → Настройки сайта → Образование)
 
-```json
-{
-  "experience": [
-    {
-      "position": "Backend Developer",
-      "company":  "Company Name",
-      "period":   "Jan 2023 — Present",
-      "description": "Описание опыта работы."
-    }
-  ],
-  "education": [
-    {
-      "degree":      "Bachelor of Computer Science",
-      "institution": "University Name",
-      "period":      "2019 — 2023",
-      "description": "Описание."
-    }
-  ],
-  "skills_bars": [
-    {"name": "Python",     "percent": 90},
-    {"name": "Django",     "percent": 85},
-    {"name": "PostgreSQL", "percent": 80},
-    {"name": "Docker",     "percent": 75},
-    {"name": "REST API",   "percent": 88},
-    {"name": "Git",        "percent": 85}
-  ]
-}
-```
+Inline-таблица, можно добавить несколько записей.
 
-> Если `skills_bars` не заполнен, страница /about/ покажет дефолтные навыки из `views.py`.
+| Поле | Описание |
+|------|----------|
+| `degree` | Степень / специальность |
+| `institution` | Учебное заведение |
+| `period` | Период, например: `2018 — 2022` |
+| `description` | Дополнительное описание |
+| `order` | Порядок отображения |
 
-### 3. Социальные ссылки (SocialLink)
+### 3. Опыт работы (Pages → Настройки сайта → Опыт работы)
 
-Добавляются через Inline в настройках сайта.
+Inline-таблица, можно добавить несколько записей.
+
+| Поле | Описание |
+|------|----------|
+| `position` | Должность |
+| `company` | Компания |
+| `period` | Период, например: `2022 — настоящее время` |
+| `description` | Описание обязанностей |
+| `order` | Порядок отображения |
+
+### 4. Социальные ссылки (Pages → Настройки сайта → Ссылки соцсетей)
 
 | Поле | Пример |
 |------|--------|
 | `name` | GitHub |
-| `url` | https://github.com/username |
+| `url` | `https://github.com/username` |
 | `icon_class` | `fab fa-github` |
 | `order` | 1 |
 
-Иконки — из Font Awesome 6: https://fontawesome.com/icons
+Иконки из Font Awesome 6: https://fontawesome.com/icons
 
-### 4. Проекты (Portfolio → Projects)
+### 5. Сертификаты (Pages → Настройки сайта → Сертификаты)
+
+| Поле | Описание |
+|------|----------|
+| `name` | Название сертификата |
+| `issuer` | Кто выдал |
+| `year` | Год получения |
+| `image` | Изображение сертификата |
+| `url` | Ссылка на оригинал (опционально) |
+| `order` | Порядок в слайдере |
+
+### 6. Теги технологий (Portfolio → Теги технологий)
+
+| Поле | Описание |
+|------|----------|
+| `name` | Название технологии |
+| `color` | HEX-цвет, например `#3776AB` |
+| `logo_key` | Slug для иконки с [simpleicons.org](https://simpleicons.org) |
+
+Примеры `logo_key`: `python`, `django`, `fastapi`, `flask`, `git`, `postgresql`,
+`docker`, `nginx`, `vite`, `telegram`, `googlesheets`, `n8n`, `javascript`, `html5`, `css3`
+
+### 7. Проекты (Portfolio → Проекты)
 
 | Поле | Описание |
 |------|----------|
 | `title` | Название проекта |
-| `slug` | URL-идентификатор (авто) |
-| `mockup` | Изображение для сетки |
-| `short_description` | Краткое описание |
-| `task` / `solution` / `result` | Описание работы |
+| `slug` | URL-идентификатор (заполняется автоматически) |
+| `mockup_image` | Изображение для карточки (рекомендуется 4:3) |
+| `brief_description` | Краткое описание (до 300 символов) |
+| `task_description` | Задача |
+| `solution_description` | Решение |
+| `how_it_works` | Как работает (опционально) |
+| `result_description` | Результат |
+| `demo_video_url` | Ссылка на YouTube/Vimeo (embed URL) |
+| `demo_video_file` | Видео-файл |
+| `source_link` | Ссылка на репозиторий |
+| `live_demo_link` | Ссылка на живое демо |
 | `tech_stack` | Теги технологий |
-| `is_featured` | Показывать на главной |
+| `is_featured` | Показывать на главной странице |
 | `is_published` | Опубликован |
+| `order` | Порядок в сетке |
+
+Скриншоты добавляются через Inline «Скриншоты проекта» — появятся в слайдере на детальной странице.
+
+> В полях описаний (задача, решение и т.д.) поддерживаются абзацы: двойной перенос строки создаёт новый абзац.
 
 ---
 
 ## Структура проекта
 
 ```
-YourPortfolio/
 ├── apps/
 │   ├── pages/          # Главная, About, Services, Resume, Contact
 │   ├── portfolio/      # Список и детали проектов
 │   ├── accounts/       # Авторизация
 │   ├── core/           # Абстрактные модели, context processors
-│   └── crm/            # (Phase 2)
+│   └── crm/            # CRM-модуль
 ├── config/
 │   └── settings/
 │       ├── base.py
-│       ├── local.py
+│       ├── local.py    # Для разработки (DEBUG=True, SQLite)
 │       └── production.py
 ├── templates/
 │   ├── base.html
@@ -172,30 +195,29 @@ YourPortfolio/
 ├── static/
 │   ├── css/main.css
 │   └── js/main.js
-└── media/              # Загруженные файлы
+├── requirements/
+│   ├── base.txt
+│   ├── local.txt
+│   └── production.txt
+└── docker/             # Docker-конфигурация
 ```
 
 ---
 
-## Docker (опционально)
+## Стек
+
+- **Backend:** Django 5.2, Python
+- **БД:** SQLite (разработка) / PostgreSQL (продакшн)
+- **Фронтенд:** Vanilla JS, кастомный CSS (без Bootstrap)
+- **Деплой:** Gunicorn + Nginx + Docker
+- **Статика:** WhiteNoise
+
+---
+
+## Docker
 
 ```bash
 docker-compose up --build
-```
-
----
-
-## Настройка навыков (skills_bars)
-
-Для страницы `/about/` навыки с прогресс-барами берутся из `cv_data.skills_bars`.
-Каждый элемент: `{"name": "Название", "percent": 85}`.
-
-Если поле не заполнено — показываются дефолтные навыки из `apps/pages/views.py`:
-```python
-DEFAULT_SKILLS = [
-    {'name': 'Python',     'percent': 90},
-    ...
-]
 ```
 
 ---
@@ -211,4 +233,4 @@ DEFAULT_SKILLS = [
 | `--text-primary` | `#ffffff` | Основной текст |
 | `--text-secondary` | `#8892b0` | Вторичный текст |
 
-Все переменные — в `static/css/main.css` в блоке `:root { }`.
+Все переменные — в `static/css/main.css` в блоке `:root {}`.
