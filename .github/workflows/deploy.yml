@@ -1,0 +1,45 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            set -e
+
+            APP_DIR="/root/yourportfolio"
+
+            # Клонируем репо если первый раз
+            if [ ! -d "$APP_DIR" ]; then
+              git clone ${{ secrets.GIT_REPO_URL }} "$APP_DIR"
+            fi
+
+            cd "$APP_DIR"
+
+            # Получаем последние изменения
+            git fetch origin main
+            git reset --hard origin/main
+
+            # Создаём .env из секрета (перезаписываем при каждом деплое)
+            cat > .env <<'ENVEOF'
+            ${{ secrets.ENV_FILE }}
+            ENVEOF
+
+            # Запускаем/обновляем контейнеры
+            docker compose up -d --build --remove-orphans
+
+            # Удаляем старые образы
+            docker image prune -f
