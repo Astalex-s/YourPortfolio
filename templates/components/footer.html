@@ -1,0 +1,33 @@
+{% load static %}
+<footer class="site-footer">
+  <div class="footer-inner">
+
+    <a href="{% url 'pages:home' %}" class="footer-logo-link">
+      {% if site_settings and site_settings.logo %}
+        <img src="{{ site_settings.logo.url }}" alt="Логотип" class="footer-logo-img">
+      {% else %}
+        <span class="footer-logo">
+          {% if site_settings %}{{ site_settings.owner_name|truncatewords:1 }}{% else %}Портфолио{% endif %}
+        </span>
+      {% endif %}
+    </a>
+
+    <p class="footer-copyright">
+      &copy; {% now "Y" %}
+      {% if site_settings %}{{ site_settings.owner_name }}{% endif %}.
+      Создано на Django.
+    </p>
+
+    {% if site_settings and site_settings.social_links.all %}
+      <div class="footer-socials">
+        {% for link in site_settings.social_links.all %}
+          <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer"
+             class="footer-social" title="{{ link.name }}">
+            <i class="{{ link.icon_class }}"></i>
+          </a>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+  </div>
+</footer>

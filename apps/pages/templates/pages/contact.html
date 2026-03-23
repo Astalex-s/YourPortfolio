@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Контакты — {% if site_settings %}{{ site_settings.owner_name }}{% endif %}{% endblock %}
+
+{% block content %}
+<section class="site-section contact-section mt-page" id="contact">
+  <div class="section-inner">
+
+    <div class="section-heading">
+      <span class="section-bg-text">КОНТАКТЫ</span>
+      <p class="section-title">Контакты</p>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="contact-inner">
+      <h2 class="contact-subtitle">Напишите мне</h2>
+
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert-banner {% if 'success' in message.tags %}alert-success{% else %}alert-error{% endif %}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      <form class="contact-form" method="post" action="{% url 'pages:contact' %}">
+        {% csrf_token %}
+        <input type="text"  name="name"    class="contact-input"    placeholder="Ваше имя"      required
+               value="{{ form.name.value|default:'' }}">
+        <input type="email" name="email"   class="contact-input"    placeholder="Ваш Email"     required
+               value="{{ form.email.value|default:'' }}">
+        <input type="text"  name="subject" class="contact-input"    placeholder="Тема"
+               value="{{ form.subject.value|default:'Обращение с сайта' }}">
+        <textarea           name="message" class="contact-textarea" placeholder="Ваше сообщение" required
+                  rows="4">{{ form.message.value|default:'' }}</textarea>
+        <label class="contact-check">
+          <input type="checkbox" required>
+          Я согласен на обработку <a href="#">персональных данных</a>
+        </label>
+        <button type="submit" class="btn-send">Отправить</button>
+      </form>
+    </div>
+
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Обо мне — {% if site_settings %}{{ site_settings.owner_name }}{% endif %}{% endblock %}
+
+{% block content %}
+
+<!-- ── Обо мне ── -->
+<section class="site-section about-section mt-page" id="about">
+  <div class="section-inner">
+
+    <div class="section-heading">
+      <span class="section-bg-text">ОБО МНЕ</span>
+      <p class="section-title">Обо мне</p>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="about-grid">
+
+      <div>
+        {% if site_settings and site_settings.about_photo %}
+          <img src="{{ site_settings.about_photo.url }}"
+               alt="{{ site_settings.owner_name }}"
+               class="about-photo">
+        {% elif site_settings and site_settings.avatar %}
+          <img src="{{ site_settings.avatar.url }}"
+               alt="{{ site_settings.owner_name }}"
+               class="about-photo">
+        {% else %}
+          <div class="about-photo-placeholder">
+            <i class="fas fa-user"></i>
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="about-content">
+        <h2 class="about-name">
+          Привет! Я {% if site_settings %}{{ site_settings.owner_name }}{% else %}Разработчик{% endif %}
+        </h2>
+        <span class="about-role">
+          {% if site_settings %}{{ site_settings.tagline }}{% else %}Backend Developer{% endif %}
+        </span>
+        <div class="about-bio">
+          {% if site_settings %}{{ site_settings.about_text|linebreaks }}{% endif %}
+        </div>
+
+        <table class="about-info-table">
+          {% if site_settings %}
+            {% if site_settings.email %}
+              <tr>
+                <td>Email</td>
+                <td><a href="mailto:{{ site_settings.email }}" style="color:var(--text-primary);text-decoration:none;">{{ site_settings.email }}</a></td>
+              </tr>
+            {% endif %}
+            {% if site_settings.phone %}
+              <tr>
+                <td>Телефон</td>
+                <td>{{ site_settings.phone }}</td>
+              </tr>
+            {% endif %}
+            {% if site_settings.location %}
+              <tr>
+                <td>Город</td>
+                <td>{{ site_settings.location }}</td>
+              </tr>
+            {% endif %}
+          {% endif %}
+          <tr>
+            <td>Фриланс</td>
+            <td>Доступен</td>
+          </tr>
+        </table>
+
+        {% if site_settings and site_settings.resume_pdf %}
+          <a href="{{ site_settings.resume_pdf.url }}" class="btn-download" download>
+            <i class="fas fa-download"></i> Скачать резюме
+          </a>
+        {% endif %}
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── Навыки ── -->
+<section class="site-section skills-section" id="skills">
+  <div class="section-inner">
+
+    <div class="section-heading">
+      <span class="section-bg-text">НАВЫКИ</span>
+      <p class="section-title">Навыки</p>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="skills-grid">
+
+      <div class="skills-text">
+        <h2>Все навыки, которые я применяю в своей работе.</h2>
+        {% if site_settings %}
+          <p>{{ site_settings.about_text|truncatewords:55 }}</p>
+        {% endif %}
+      </div>
+
+      <div class="skills-bars">
+        {% if site_settings and site_settings.cv_data.skills_bars %}
+          {% for skill in site_settings.cv_data.skills_bars %}
+            <div class="skill-item">
+              <div class="skill-header">
+                <span class="skill-name">{{ skill.name }}</span>
+                <span class="skill-percent">{{ skill.percent }}%</span>
+              </div>
+              <div class="skill-bar-bg">
+                <div class="skill-bar-fill" data-percent="{{ skill.percent }}"></div>
+              </div>
+            </div>
+          {% endfor %}
+        {% elif site_settings and site_settings.cv_data.skills %}
+          {% for skill in site_settings.cv_data.skills %}
+            <div class="skill-item">
+              <div class="skill-header">
+                <span class="skill-name">{{ skill }}</span>
+                <span class="skill-percent">80%</span>
+              </div>
+              <div class="skill-bar-bg">
+                <div class="skill-bar-fill" data-percent="80"></div>
+              </div>
+            </div>
+          {% endfor %}
+        {% else %}
+          {% for item in default_skills %}
+            <div class="skill-item">
+              <div class="skill-header">
+                <span class="skill-name">{{ item.name }}</span>
+                <span class="skill-percent">{{ item.percent }}%</span>
+              </div>
+              <div class="skill-bar-bg">
+                <div class="skill-bar-fill" data-percent="{{ item.percent }}"></div>
+              </div>
+            </div>
+          {% endfor %}
+        {% endif %}
+      </div>
+
+    </div>
+  </div>
+</section>
+
+{% endblock %}

@@ -1,0 +1,286 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ project.title }} — Портфолио{% endblock %}
+{% block meta_description %}{{ project.brief_description }}{% endblock %}
+
+{% block content %}
+<section class="site-section project-detail-section mt-page">
+  <div class="section-inner">
+
+    <!-- Назад -->
+    <a href="{% url 'portfolio:list' %}" class="project-back-link">
+      <i class="fas fa-arrow-left"></i> Портфолио
+    </a>
+
+    <!-- Заголовок -->
+    <h1 class="project-title">{{ project.title }}</h1>
+    <p class="project-brief">{{ project.brief_description }}</p>
+
+    <div class="project-header-links">
+      {% if project.live_demo_link %}
+        <a href="{{ project.live_demo_link }}" target="_blank" rel="noopener noreferrer" class="btn-accent-sm">
+          <i class="fas fa-external-link-alt"></i> Live Demo
+        </a>
+      {% endif %}
+      {% if project.source_link %}
+        <a href="{{ project.source_link }}" target="_blank" rel="noopener noreferrer" class="btn-outline-sm">
+          <i class="fab fa-github"></i> Исходники
+        </a>
+      {% endif %}
+    </div>
+
+    <!-- Медиа-слайдер -->
+    {% with screenshots=project.screenshots.all %}
+    {% if screenshots or project.demo_video_url or project.demo_video_file %}
+    <div class="project-media">
+      <div class="media-main" id="mediaMain">
+
+        <!-- Слайды: скриншоты -->
+        {% for shot in screenshots %}
+        <div class="media-slide {% if forloop.first and not project.demo_video_url and not project.demo_video_file or forloop.first %}active{% endif %}"
+             data-type="image"
+             data-src="{{ shot.image.url }}"
+             data-caption="{{ shot.caption }}">
+          <img src="{{ shot.image.url }}" alt="{{ shot.caption|default:project.title }}" loading="lazy">
+        </div>
+        {% endfor %}
+
+        <!-- Слайды: видео-URL (YouTube/Vimeo) -->
+        {% if project.demo_video_url %}
+        <div class="media-slide {% if not screenshots %}active{% endif %}"
+             data-type="video-url"
+             data-src="{{ project.demo_video_url }}">
+          <iframe src="{{ project.demo_video_url }}"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowfullscreen loading="lazy"></iframe>
+        </div>
+        {% endif %}
+
+        <!-- Слайды: видео-файл -->
+        {% if project.demo_video_file %}
+        <div class="media-slide {% if not screenshots and not project.demo_video_url %}active{% endif %}"
+             data-type="video-file"
+             data-src="{{ project.demo_video_file.url }}">
+          <video controls preload="metadata">
+            <source src="{{ project.demo_video_file.url }}">
+          </video>
+        </div>
+        {% endif %}
+
+        <!-- Стрелки (только если слайдов > 1) -->
+        {% if screenshots.count > 1 or screenshots and project.demo_video_url or screenshots and project.demo_video_file %}
+        <button class="media-arrow media-arrow--prev" id="mediaPrev" aria-label="Назад">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+        <button class="media-arrow media-arrow--next" id="mediaNext" aria-label="Вперёд">
+          <i class="fas fa-chevron-right"></i>
+        </button>
+        {% endif %}
+      </div>
+
+      <!-- Миниатюры -->
+      {% with total_slides=screenshots.count %}
+      {% if total_slides > 1 or total_slides and project.demo_video_url or total_slides and project.demo_video_file %}
+      <div class="media-thumbs" id="mediaThumbs">
+        {% for shot in screenshots %}
+        <div class="media-thumb {% if forloop.first %}active{% endif %}" data-index="{{ forloop.counter0 }}">
+          <img src="{{ shot.image.url }}" alt="" loading="lazy">
+        </div>
+        {% endfor %}
+        {% if project.demo_video_url %}
+        <div class="media-thumb" data-index="{{ screenshots.count }}">
+          <span class="media-thumb-icon"><i class="fas fa-play-circle"></i></span>
+        </div>
+        {% endif %}
+        {% if project.demo_video_file %}
+        <div class="media-thumb" data-index="{{ screenshots.count|add:"1" }}">
+          <span class="media-thumb-icon"><i class="fas fa-film"></i></span>
+        </div>
+        {% endif %}
+      </div>
+      {% endif %}
+      {% endwith %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <!-- Задача / Как работает / Решение / Результат -->
+    <div class="project-tsr">
+
+      <div class="project-tsr-block">
+        <div class="project-tsr-icon project-tsr-icon--task">
+          <i class="fas fa-bullseye"></i>
+        </div>
+        <div class="project-tsr-label">Задача</div>
+        <div class="project-tsr-text">{{ project.task_description|linebreaks }}</div>
+      </div>
+
+      <div class="project-tsr-block">
+        <div class="project-tsr-icon project-tsr-icon--solution">
+          <i class="fas fa-lightbulb"></i>
+        </div>
+        <div class="project-tsr-label">Решение</div>
+        <div class="project-tsr-text">{{ project.solution_description|linebreaks }}</div>
+      </div>
+
+      {% if project.how_it_works %}
+      <div class="project-tsr-block">
+        <div class="project-tsr-icon project-tsr-icon--works">
+          <i class="fas fa-cogs"></i>
+        </div>
+        <div class="project-tsr-label">Как работает</div>
+        <div class="project-tsr-text">{{ project.how_it_works|linebreaks }}</div>
+      </div>
+      {% endif %}
+
+      <div class="project-tsr-block">
+        <div class="project-tsr-icon project-tsr-icon--result">
+          <i class="fas fa-trophy"></i>
+        </div>
+        <div class="project-tsr-label">Результат</div>
+        <div class="project-tsr-text">{{ project.result_description|linebreaks }}</div>
+      </div>
+
+    </div>
+
+    <!-- Стек технологий -->
+    {% if project.tech_stack.all %}
+    <div>
+      <div class="project-section-label">Стек технологий</div>
+      <div class="tech-chips">
+        {% for tag in project.tech_stack.all %}
+        <div class="tech-chip">
+          {% if tag.logo_key %}
+            <img src="https://cdn.simpleicons.org/{{ tag.logo_key }}/ffffff"
+                 alt="{{ tag.name }}"
+                 onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+            <span class="tech-chip-dot" style="background:{{ tag.color }};display:none;"></span>
+          {% else %}
+            <span class="tech-chip-dot" style="background:{{ tag.color }}"></span>
+          {% endif %}
+          {{ tag.name }}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Кнопка возврата -->
+    <a href="{% url 'portfolio:list' %}" class="project-back-btn">
+      <i class="fas fa-arrow-left"></i> Вернуться в портфолио
+    </a>
+
+  </div>
+</section>
+
+<!-- Лайтбокс -->
+<div class="media-lightbox" id="mediaLightbox">
+  <div class="media-lightbox-bg" id="mediaLightboxBg"></div>
+  <div class="media-lightbox-inner">
+    <button class="media-lightbox-close" id="mediaLightboxClose">
+      <i class="fas fa-times"></i>
+    </button>
+    <img src="" alt="" class="media-lightbox-img" id="lbImg">
+    <video controls class="media-lightbox-video" id="lbVideo">
+      <source src="" id="lbVideoSrc">
+    </video>
+    <iframe src="" class="media-lightbox-iframe" id="lbIframe"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+    <div class="media-lightbox-caption" id="lbCaption"></div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+  const slides  = Array.from(document.querySelectorAll('.media-slide'));
+  const thumbs  = Array.from(document.querySelectorAll('.media-thumb'));
+  const btnPrev = document.getElementById('mediaPrev');
+  const btnNext = document.getElementById('mediaNext');
+  const total   = slides.length;
+  let current   = 0;
+
+  if (total === 0) return;
+
+  function goTo(idx) {
+    slides[current].classList.remove('active');
+    if (thumbs[current]) thumbs[current].classList.remove('active');
+    current = (idx + total) % total;
+    slides[current].classList.add('active');
+    if (thumbs[current]) thumbs[current].classList.add('active');
+  }
+
+  if (btnPrev) btnPrev.addEventListener('click', (e) => { e.stopPropagation(); goTo(current - 1); });
+  if (btnNext) btnNext.addEventListener('click', (e) => { e.stopPropagation(); goTo(current + 1); });
+
+  thumbs.forEach((t) => t.addEventListener('click', () => goTo(+t.dataset.index)));
+
+  // Lightbox
+  const lb       = document.getElementById('mediaLightbox');
+  const lbImg    = document.getElementById('lbImg');
+  const lbVideo  = document.getElementById('lbVideo');
+  const lbVSrc   = document.getElementById('lbVideoSrc');
+  const lbIframe = document.getElementById('lbIframe');
+  const lbCap    = document.getElementById('lbCaption');
+
+  function openLightbox(slide) {
+    const type = slide.dataset.type;
+    const src  = slide.dataset.src;
+    const cap  = slide.dataset.caption || '';
+
+    lbImg.style.display    = 'none';
+    lbVideo.style.display  = 'none';
+    lbIframe.style.display = 'none';
+
+    if (type === 'image') {
+      lbImg.src = src;
+      lbImg.style.display = 'block';
+    } else if (type === 'video-file') {
+      lbVSrc.src = src;
+      lbVideo.load();
+      lbVideo.style.display = 'block';
+    } else if (type === 'video-url') {
+      lbIframe.src = src;
+      lbIframe.style.display = 'block';
+    }
+
+    lbCap.textContent = cap;
+    lb.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeLightbox() {
+    lb.classList.remove('open');
+    lbIframe.src = '';
+    lbVideo.pause();
+    document.body.style.overflow = '';
+  }
+
+  // Клик по слайду с изображением открывает лайтбокс
+  slides.forEach((slide) => {
+    slide.addEventListener('click', () => {
+      if (slide.dataset.type === 'image') openLightbox(slide);
+    });
+  });
+
+  document.getElementById('mediaLightboxClose').addEventListener('click', closeLightbox);
+  document.getElementById('mediaLightboxBg').addEventListener('click', closeLightbox);
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeLightbox(); });
+
+  // Свайп на мобильных
+  const main = document.getElementById('mediaMain');
+  if (main && total > 1) {
+    let startX = 0;
+    main.addEventListener('touchstart', (e) => { startX = e.touches[0].clientX; }, { passive: true });
+    main.addEventListener('touchend', (e) => {
+      const diff = startX - e.changedTouches[0].clientX;
+      if (Math.abs(diff) > 40) goTo(diff > 0 ? current + 1 : current - 1);
+    });
+  }
+})();
+</script>
+{% endblock %}

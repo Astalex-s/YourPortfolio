@@ -1,0 +1,37 @@
+{% load static %}
+<header class="site-header">
+  <div class="header-inner">
+
+    <a href="{% url 'pages:home' %}" class="logo">
+      {% if site_settings and site_settings.logo %}
+        <img src="{{ site_settings.logo.url }}" alt="Логотип" class="logo-img">
+      {% else %}
+        <span class="logo-icon"><i class="fas fa-code"></i></span>
+      {% endif %}
+    </a>
+
+    <button class="nav-toggle" id="navToggle" aria-label="Меню">
+      <span></span><span></span><span></span>
+    </button>
+
+    <ul class="site-nav" id="siteNav">
+      <li><a href="{% url 'pages:home' %}">Главная</a></li>
+      <li><a href="{% url 'pages:about' %}">Обо мне</a></li>
+      <li><a href="{% url 'pages:services' %}">Услуги</a></li>
+      <li><a href="{% url 'pages:resume' %}">Резюме</a></li>
+      <li><a href="{% url 'portfolio:list' %}">Портфолио</a></li>
+      <li><a href="{% url 'pages:contact' %}">Контакты</a></li>
+      {% if user.is_authenticated and user.is_staff %}
+        <li><a href="{% url 'admin:index' %}">Админ</a></li>
+      {% endif %}
+    </ul>
+
+    <div class="header-phone">
+      <span class="header-divider"></span>
+      {% if site_settings and site_settings.phone %}
+        <a href="tel:{{ site_settings.phone }}">{{ site_settings.phone }}</a>
+      {% endif %}
+    </div>
+
+  </div>
+</header>

@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Портфолио — {% if site_settings %}{{ site_settings.owner_name }}{% endif %}{% endblock %}
+
+{% block content %}
+<section class="site-section portfolio-section mt-page" id="portfolio">
+  <div class="section-inner">
+
+    <div class="section-heading">
+      <span class="section-bg-text">ПОРТФОЛИО</span>
+      <p class="section-title">Портфолио</p>
+      <div class="section-line"></div>
+    </div>
+
+    {% if all_tags %}
+      <div class="portfolio-filters">
+        <a href="{% url 'portfolio:list' %}"
+           class="portfolio-filter-btn {% if not active_tag %}active{% endif %}">Все</a>
+        {% for tag in all_tags %}
+          <a href="{% url 'portfolio:list' %}?tag={{ tag.name }}"
+             class="portfolio-filter-btn {% if active_tag == tag.name %}active{% endif %}">
+            {{ tag.name }}
+          </a>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    {% if projects %}
+      <div class="portfolio-grid">
+        {% for project in projects %}
+          <div class="portfolio-item">
+
+            <div class="portfolio-item-img">
+              {% if project.mockup_image %}
+                <img src="{{ project.mockup_image.url }}" alt="{{ project.title }}" loading="lazy">
+              {% else %}
+                <div class="portfolio-item-placeholder">
+                  <i class="fas fa-code"></i>
+                </div>
+              {% endif %}
+              <div class="portfolio-item-overlay">
+                <h3>{{ project.title }}</h3>
+                <p>{{ project.brief_description }}</p>
+              </div>
+            </div>
+
+            <!-- Только на мобильных -->
+            <div class="portfolio-item-info">
+              <h3>{{ project.title }}</h3>
+              <p>{{ project.brief_description }}</p>
+            </div>
+
+            <a href="{% url 'portfolio:detail' project.slug %}" class="portfolio-item-btn">Подробнее...</a>
+
+          </div>
+        {% endfor %}
+      </div>
+
+      {% if is_paginated %}
+        <div class="portfolio-pagination">
+          {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}{% if active_tag %}&tag={{ active_tag }}{% endif %}"
+               class="page-btn"><i class="fas fa-chevron-left"></i></a>
+          {% endif %}
+          {% for num in page_obj.paginator.page_range %}
+            <a href="?page={{ num }}{% if active_tag %}&tag={{ active_tag }}{% endif %}"
+               class="page-btn {% if page_obj.number == num %}active{% endif %}">{{ num }}</a>
+          {% endfor %}
+          {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% if active_tag %}&tag={{ active_tag }}{% endif %}"
+               class="page-btn"><i class="fas fa-chevron-right"></i></a>
+          {% endif %}
+        </div>
+      {% endif %}
+
+    {% else %}
+      <div style="text-align:center;padding:80px 0;color:var(--text-muted);">
+        <i class="fas fa-folder-open" style="font-size:3rem;margin-bottom:16px;display:block;"></i>
+        <p>Проектов пока нет. Добавьте их через админ-панель.</p>
+      </div>
+    {% endif %}
+
+  </div>
+</section>
+{% endblock %}

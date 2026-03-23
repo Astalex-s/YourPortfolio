@@ -1,0 +1,244 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Резюме — {% if site_settings %}{{ site_settings.owner_name }}{% endif %}{% endblock %}
+
+{% block content %}
+
+<!-- ── Личные данные ── -->
+<section class="site-section resume-section mt-page" id="resume">
+  <div class="section-inner">
+
+    <div class="section-heading">
+      <span class="section-bg-text">РЕЗЮМЕ</span>
+      <p class="section-title">Резюме</p>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="resume-grid">
+
+      <div class="resume-col">
+        <h3 class="resume-col-title">
+          <i class="fas fa-graduation-cap"></i> Образование
+        </h3>
+        {% for edu in educations %}
+          <div class="timeline-item">
+            <div class="timeline-title">{{ edu.degree }}</div>
+            <div class="timeline-period">{{ edu.period }}</div>
+            <div class="timeline-org">{{ edu.institution }}</div>
+            {% if edu.description %}
+              <div class="timeline-desc">{{ edu.description }}</div>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+
+      <div class="resume-col">
+        <h3 class="resume-col-title">
+          <i class="fas fa-briefcase"></i> Опыт работы
+        </h3>
+        {% for exp in experiences %}
+          <div class="timeline-item">
+            <div class="timeline-title">{{ exp.position }}</div>
+            <div class="timeline-period">{{ exp.period }}</div>
+            <div class="timeline-org">{{ exp.company }}</div>
+            {% if exp.description %}
+              <div class="timeline-desc">{{ exp.description }}</div>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+
+    </div>
+
+    {% if site_settings and site_settings.resume_pdf %}
+      <div style="text-align:center;margin-top:50px;">
+        <a href="{{ site_settings.resume_pdf.url }}" class="btn-download" download>
+          <i class="fas fa-download"></i> Скачать PDF
+        </a>
+      </div>
+    {% endif %}
+
+  </div>
+</section>
+
+<!-- ── Сертификаты ── -->
+{% if certificates %}
+<section class="site-section certs-section" id="certificates">
+  <div class="section-inner">
+
+    <div class="section-heading">
+      <span class="section-bg-text">СЕРТИФИКАТЫ</span>
+      <p class="section-title">Сертификаты</p>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="certs-slider-wrapper">
+
+      <!-- Кнопки -->
+      <button class="certs-arrow certs-arrow--prev" id="certPrev" aria-label="Назад">
+        <i class="fas fa-chevron-left"></i>
+      </button>
+      <button class="certs-arrow certs-arrow--next" id="certNext" aria-label="Вперёд">
+        <i class="fas fa-chevron-right"></i>
+      </button>
+
+      <!-- Стек карточек -->
+      <div class="certs-stack" id="certsStack">
+        {% for cert in certificates %}
+          <div class="cert-card" data-index="{{ forloop.counter0 }}"
+               data-title="{{ cert.name }}"
+               data-issuer="{{ cert.issuer }}"
+               data-year="{{ cert.year }}"
+               {% if cert.image %}data-img="{{ cert.image.url }}"{% endif %}
+               {% if cert.url %}data-url="{{ cert.url }}"{% endif %}>
+
+            {% if cert.image %}
+              <img src="{{ cert.image.url }}" alt="{{ cert.name }}" class="cert-img">
+            {% else %}
+              <div class="cert-placeholder">
+                <i class="fas fa-certificate"></i>
+                <span>{{ cert.name }}</span>
+              </div>
+            {% endif %}
+
+            <div class="cert-info">
+              <div class="cert-name">{{ cert.name }}</div>
+              <div class="cert-meta">{{ cert.issuer }} · {{ cert.year }}</div>
+            </div>
+
+            <div class="cert-hover-hint"><i class="fas fa-expand-alt"></i></div>
+          </div>
+        {% endfor %}
+      </div>
+
+      <!-- Точки навигации -->
+      <div class="certs-dots" id="certsDots">
+        {% for cert in certificates %}
+          <button class="cert-dot {% if forloop.first %}active{% endif %}"
+                  data-goto="{{ forloop.counter0 }}"></button>
+        {% endfor %}
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Лайтбокс -->
+<div class="cert-lightbox" id="certLightbox">
+  <div class="cert-lightbox-overlay" id="certLightboxOverlay"></div>
+  <div class="cert-lightbox-content">
+    <button class="cert-lightbox-close" id="certLightboxClose">
+      <i class="fas fa-times"></i>
+    </button>
+    <img src="" alt="" class="cert-lightbox-img" id="certLightboxImg">
+    <div class="cert-lightbox-placeholder" id="certLightboxPlaceholder">
+      <i class="fas fa-certificate"></i>
+    </div>
+    <div class="cert-lightbox-meta">
+      <h3 id="certLightboxTitle"></h3>
+      <p id="certLightboxMeta"></p>
+      <a href="#" id="certLightboxLink" target="_blank" rel="noopener noreferrer"
+         class="btn-download" style="margin-top:16px;display:none;">
+        <i class="fas fa-external-link-alt"></i> Открыть оригинал
+      </a>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block extra_js %}
+{% if certificates %}
+<script>
+(function () {
+  const stack   = document.getElementById('certsStack');
+  const cards   = Array.from(stack.querySelectorAll('.cert-card'));
+  const dots    = Array.from(document.querySelectorAll('.cert-dot'));
+  const btnPrev = document.getElementById('certPrev');
+  const btnNext = document.getElementById('certNext');
+  const lb      = document.getElementById('certLightbox');
+  const lbImg   = document.getElementById('certLightboxImg');
+  const lbPh    = document.getElementById('certLightboxPlaceholder');
+  const lbTitle = document.getElementById('certLightboxTitle');
+  const lbMeta  = document.getElementById('certLightboxMeta');
+  const lbLink  = document.getElementById('certLightboxLink');
+
+  let current = 0;
+  const total = cards.length;
+
+  function applyStack(active) {
+    cards.forEach((card, i) => {
+      card.classList.remove('cert-active', 'cert-left', 'cert-right', 'cert-behind');
+      const diff = i - active;
+
+      if (diff === 0) {
+        card.classList.add('cert-active');
+      } else if (diff === 1 || diff === -(total - 1)) {
+        card.classList.add('cert-right');
+      } else if (diff === -1 || diff === total - 1) {
+        card.classList.add('cert-left');
+      } else {
+        card.classList.add('cert-behind');
+      }
+    });
+
+    dots.forEach((d, i) => d.classList.toggle('active', i === active));
+  }
+
+  function goTo(idx) {
+    current = (idx + total) % total;
+    applyStack(current);
+  }
+
+  btnNext.addEventListener('click', () => goTo(current + 1));
+  btnPrev.addEventListener('click', () => goTo(current - 1));
+
+  dots.forEach(d => d.addEventListener('click', () => goTo(+d.dataset.goto)));
+
+  // Открытие лайтбокса
+  cards.forEach(card => {
+    card.addEventListener('click', () => {
+      const img = card.dataset.img;
+      const url = card.dataset.url;
+
+      lbTitle.textContent = card.dataset.title;
+      lbMeta.textContent  = card.dataset.issuer + ' · ' + card.dataset.year;
+
+      if (img) {
+        lbImg.src = img;
+        lbImg.style.display = 'block';
+        lbPh.style.display  = 'none';
+      } else {
+        lbImg.style.display = 'none';
+        lbPh.style.display  = 'flex';
+      }
+
+      if (url) {
+        lbLink.href = url;
+        lbLink.style.display = 'inline-flex';
+      } else {
+        lbLink.style.display = 'none';
+      }
+
+      lb.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    });
+  });
+
+  function closeLightbox() {
+    lb.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  document.getElementById('certLightboxClose').addEventListener('click', closeLightbox);
+  document.getElementById('certLightboxOverlay').addEventListener('click', closeLightbox);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+
+  // Инициализация
+  applyStack(0);
+})();
+</script>
+{% endif %}
+{% endblock %}

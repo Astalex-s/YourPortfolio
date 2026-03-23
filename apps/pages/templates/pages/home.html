@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% if site_settings %}{{ site_settings.owner_name }} — Портфолио{% else %}Портфолио{% endif %}{% endblock %}
+
+{% block content %}
+<section class="hero-section" id="home">
+  <div class="hero-inner">
+
+    <div class="hero-content">
+      <span class="hero-greeting">Привет, я</span>
+      <h1 class="hero-name">
+        {% if site_settings %}{{ site_settings.owner_name }}{% else %}Ваше имя{% endif %}
+      </h1>
+      <span class="hero-role">
+        {% if site_settings %}{{ site_settings.tagline }}{% else %}Backend Developer{% endif %}
+      </span>
+      <a href="{% url 'pages:contact' %}" class="btn-hire">Нанять меня</a>
+
+      {% if site_settings and site_settings.social_links.all %}
+        <div class="hero-socials">
+          {% for link in site_settings.social_links.all %}
+            <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer"
+               class="hero-social-link" title="{{ link.name }}">
+              <i class="{{ link.icon_class }}"></i>
+            </a>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="hero-photo-wrapper">
+      {% if site_settings and site_settings.avatar %}
+        <img src="{{ site_settings.avatar.url }}"
+             alt="{{ site_settings.owner_name }}"
+             class="hero-photo">
+      {% else %}
+        <div class="hero-photo-placeholder">
+          <i class="fas fa-user"></i>
+        </div>
+      {% endif %}
+    </div>
+
+  </div>
+</section>
+{% endblock %}

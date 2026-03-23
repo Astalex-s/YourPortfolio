@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Услуги — {% if site_settings %}{{ site_settings.owner_name }}{% endif %}{% endblock %}
+
+{% block content %}
+<section class="site-section services-section mt-page" id="services">
+  <div class="section-inner">
+
+    <div class="section-heading">
+      <span class="section-bg-text">УСЛУГИ</span>
+      <p class="section-title">Услуги</p>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="services-grid">
+      {% if services %}
+        {% for service in services %}
+          <div class="service-card">
+            <div class="service-icon">
+              <i class="{{ service.icon|default:'fas fa-code' }}"></i>
+            </div>
+            <h3>{{ service.title }}</h3>
+            <p>{{ service.description }}</p>
+          </div>
+        {% endfor %}
+      {% else %}
+        <div class="service-card">
+          <div class="service-icon"><i class="fas fa-code"></i></div>
+          <h3>Веб-разработка</h3>
+          <p>Создание надёжных и масштабируемых веб-приложений на Python, Django и современных фреймворках.</p>
+        </div>
+        <div class="service-card">
+          <div class="service-icon"><i class="fas fa-server"></i></div>
+          <h3>Backend-разработка</h3>
+          <p>Проектирование серверной логики, REST API и микросервисной архитектуры.</p>
+        </div>
+        <div class="service-card">
+          <div class="service-icon"><i class="fas fa-database"></i></div>
+          <h3>Проектирование БД</h3>
+          <p>Создание оптимизированных схем баз данных и запросов с PostgreSQL, Redis и другими СУБД.</p>
+        </div>
+        <div class="service-card">
+          <div class="service-icon"><i class="fas fa-cloud"></i></div>
+          <h3>Деплой в облако</h3>
+          <p>Развёртывание и сопровождение приложений на облачных платформах с Docker и CI/CD.</p>
+        </div>
+        <div class="service-card">
+          <div class="service-icon"><i class="fas fa-plug"></i></div>
+          <h3>Интеграция API</h3>
+          <p>Подключение сторонних сервисов и создание документированных RESTful API.</p>
+        </div>
+        <div class="service-card">
+          <div class="service-icon"><i class="fas fa-robot"></i></div>
+          <h3>Интеграция ИИ</h3>
+          <p>Встраивание возможностей искусственного интеллекта и языковых моделей в веб-приложения.</p>
+        </div>
+        <div class="service-card">
+          <div class="service-icon"><i class="fas fa-comment-dots"></i></div>
+          <h3>Чат-боты для мессенджеров</h3>
+          <p>Разработка умных чат-ботов для Telegram, VK, Max и других мессенджеров с использованием современных AI-технологий.</p>
+        </div>
+        <div class="service-card">
+          <div class="service-icon"><i class="fas fa-network-wired"></i></div>
+          <h3>Автоматизация на n8n</h3>
+          <p>Построение автоматизированных рабочих процессов и интеграций между сервисами с помощью платформы n8n без написания лишнего кода.</p>
+        </div>
+        <div class="service-card">
+          <div class="service-icon"><i class="fas fa-brain"></i></div>
+          <h3>AI-ассистенты</h3>
+          <p>Создание персональных AI-ассистентов на базе GPT и других языковых моделей для автоматизации задач и поддержки клиентов.</p>
+        </div>
+      {% endif %}
+    </div>
+
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% load static %}
+<div class="portfolio-card">
+  <div class="portfolio-card-img">
+    {% if project.mockup_image %}
+      <img src="{{ project.mockup_image.url }}" alt="{{ project.title }}" loading="lazy">
+    {% else %}
+      <div class="portfolio-card-placeholder">
+        <i class="fas fa-code"></i>
+      </div>
+    {% endif %}
+  </div>
+  <div class="portfolio-card-body">
+    <div class="portfolio-card-title">{{ project.title }}</div>
+    <div class="portfolio-card-desc">{{ project.brief_description }}</div>
+    <a href="{{ project.get_absolute_url }}" class="portfolio-card-btn">Подробнее...</a>
+  </div>
+</div>

@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Вход — Portfolio{% endblock %}
+
+{% block content %}
+<section class="auth-section mt-page">
+  <div class="auth-box">
+
+    <div class="auth-header">
+      <i class="fas fa-terminal auth-icon"></i>
+      <h2>Вход</h2>
+      <p>Войдите в свой аккаунт</p>
+    </div>
+
+    <form method="post" class="auth-form">
+      {% csrf_token %}
+      {% for field in form %}
+        <div class="auth-field">
+          <label>{{ field.label }}</label>
+          {{ field }}
+          {% for error in field.errors %}
+            <span class="auth-error">{{ error }}</span>
+          {% endfor %}
+        </div>
+      {% endfor %}
+
+      {% if form.non_field_errors %}
+        <div class="auth-error-box">{{ form.non_field_errors }}</div>
+      {% endif %}
+
+      <button type="submit" class="btn-hire" style="width:100%;text-align:center;border:none;cursor:pointer;">
+        <i class="fas fa-sign-in-alt" style="margin-right:8px;"></i>Войти
+      </button>
+    </form>
+
+    <p class="auth-footer">
+      Нет аккаунта?
+      <a href="{% url 'accounts:register' %}">Зарегистрироваться</a>
+    </p>
+
+  </div>
+</section>
+{% endblock %}
