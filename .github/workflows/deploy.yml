@@ -44,5 +44,5 @@ jobs:
             # Перезапускаем nginx чтобы применить обновлённый конфиг
             docker compose restart nginx
 
-            # Удаляем старые образы
-            docker image prune -f
+            # Удаляем старые образы, контейнеры и сети (volumes не трогаем — там БД и media)
+            docker system prune -f
