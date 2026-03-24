@@ -756,6 +756,7 @@ body {
     border-radius: 8px;
     background: var(--bg-card);
     cursor: pointer;
+    border: 1px solid var(--accent);
 }
 
 .portfolio-item-img img {
