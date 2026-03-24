@@ -17,6 +17,10 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # ── Static ─────────────────────────────────────────────────────────────────
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
+# ── Uploads ────────────────────────────────────────────────────────────────
+DATA_UPLOAD_MAX_MEMORY_SIZE = 200 * 1024 * 1024   # 200 MB
+FILE_UPLOAD_MAX_MEMORY_SIZE = 200 * 1024 * 1024   # 200 MB
+
 # ── Security ───────────────────────────────────────────────────────────────
 SECURE_HSTS_SECONDS = 31536000
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True

@@ -41,5 +41,8 @@ jobs:
             # Запускаем/обновляем контейнеры
             docker compose up -d --build --remove-orphans
 
+            # Перезапускаем nginx чтобы применить обновлённый конфиг
+            docker compose restart nginx
+
             # Удаляем старые образы
             docker image prune -f
