@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ error_code }} — Ошибка</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #0a0e1a;
+      color: #e2e8f0;
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+    .error-code {
+      font-size: clamp(6rem, 20vw, 12rem);
+      font-weight: 900;
+      color: #f0a500;
+      line-height: 1;
+      letter-spacing: -4px;
+    }
+    .error-text {
+      font-size: clamp(1rem, 3vw, 1.4rem);
+      color: #94a3b8;
+      margin-top: 1rem;
+      font-weight: 400;
+    }
+    .back-link {
+      display: inline-block;
+      margin-top: 2.5rem;
+      padding: 0.75rem 2rem;
+      background: #f0a500;
+      color: #0a0e1a;
+      font-weight: 700;
+      font-size: 0.95rem;
+      border-radius: 4px;
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+    .back-link:hover { opacity: 0.85; }
+  </style>
+</head>
+<body>
+  <div>
+    <div class="error-code">{{ error_code }}</div>
+    <p class="error-text">Упс... Что-то пошло не так.</p>
+    <a href="/" class="back-link">На главную</a>
+  </div>
+</body>
+</html>
