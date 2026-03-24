@@ -116,14 +116,6 @@
         <div class="project-tsr-text">{{ project.task_description|linebreaks }}</div>
       </div>
 
-      <div class="project-tsr-block">
-        <div class="project-tsr-icon project-tsr-icon--solution">
-          <i class="fas fa-lightbulb"></i>
-        </div>
-        <div class="project-tsr-label">Решение</div>
-        <div class="project-tsr-text">{{ project.solution_description|linebreaks }}</div>
-      </div>
-
       {% if project.how_it_works %}
       <div class="project-tsr-block">
         <div class="project-tsr-icon project-tsr-icon--works">
@@ -133,6 +125,14 @@
         <div class="project-tsr-text">{{ project.how_it_works|linebreaks }}</div>
       </div>
       {% endif %}
+
+      <div class="project-tsr-block">
+        <div class="project-tsr-icon project-tsr-icon--solution">
+          <i class="fas fa-lightbulb"></i>
+        </div>
+        <div class="project-tsr-label">Решение</div>
+        <div class="project-tsr-text">{{ project.solution_description|linebreaks }}</div>
+      </div>
 
       <div class="project-tsr-block">
         <div class="project-tsr-icon project-tsr-icon--result">
