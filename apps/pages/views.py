@@ -1,8 +1,15 @@
+import json
+import logging
+from urllib.request import Request, urlopen
+from urllib.error import URLError
+
 from django.views.generic import TemplateView, FormView
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django.core.mail import send_mail
 from django.conf import settings
+
+logger = logging.getLogger(__name__)
 
 from apps.portfolio.models import Project
 from .models import SiteSettings
@@ -55,6 +62,24 @@ class ResumeView(TemplateView):
         return ctx
 
 
+def _send_telegram(text):
+    token = getattr(settings, 'TELEGRAM_BOT_TOKEN', '')
+    chat_id = getattr(settings, 'TELEGRAM_CHAT_ID', '')
+    if not token or not chat_id:
+        return
+    url = f'https://api.telegram.org/bot{token}/sendMessage'
+    payload = json.dumps({
+        'chat_id': chat_id,
+        'text': text,
+        'parse_mode': 'HTML',
+    }).encode('utf-8')
+    req = Request(url, data=payload, headers={'Content-Type': 'application/json'})
+    try:
+        urlopen(req, timeout=5)
+    except (URLError, OSError) as e:
+        logger.warning('Telegram send failed: %s', e)
+
+
 class ContactView(FormView):
     template_name = 'pages/contact.html'
     form_class = ContactForm
@@ -75,5 +100,12 @@ class ContactView(FormView):
             )
         except Exception:
             pass
+        _send_telegram(
+            f'<b>Новое сообщение с сайта</b>\n\n'
+            f'<b>Имя:</b> {contact_msg.name}\n'
+            f'<b>Email:</b> {contact_msg.email}\n'
+            f'<b>Тема:</b> {contact_msg.subject}\n\n'
+            f'{contact_msg.message}'
+        )
         messages.success(self.request, 'Сообщение отправлено! Я свяжусь с вами в ближайшее время.')
         return super().form_valid(form)
