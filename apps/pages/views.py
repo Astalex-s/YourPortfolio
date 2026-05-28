@@ -104,6 +104,7 @@ class ContactView(FormView):
             f'<b>Новое сообщение с сайта</b>\n\n'
             f'<b>Имя:</b> {contact_msg.name}\n'
             f'<b>Email:</b> {contact_msg.email}\n'
+            f'<b>Telegram:</b> {contact_msg.telegram_username}\n'
             f'<b>Тема:</b> {contact_msg.subject}\n\n'
             f'{contact_msg.message}'
         )

@@ -55,10 +55,10 @@ class SiteSettingsAdmin(admin.ModelAdmin):
 
 @admin.register(ContactMessage)
 class ContactMessageAdmin(admin.ModelAdmin):
-    list_display = ['name', 'email', 'subject', 'is_read', 'created_at']
+    list_display = ['name', 'email', 'telegram_username', 'subject', 'is_read', 'created_at']
     list_filter = ['is_read']
-    search_fields = ['name', 'email', 'subject']
-    readonly_fields = ['name', 'email', 'subject', 'message', 'created_at']
+    search_fields = ['name', 'email', 'telegram_username', 'subject']
+    readonly_fields = ['name', 'email', 'telegram_username', 'subject', 'message', 'created_at']
     list_editable = ['is_read']
 
     def has_add_permission(self, request):

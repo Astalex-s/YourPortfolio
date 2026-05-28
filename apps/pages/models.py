@@ -135,6 +135,10 @@ class WorkExperience(TimeStampedModel):
 class ContactMessage(TimeStampedModel):
     name = models.CharField(max_length=100, verbose_name='Имя')
     email = models.EmailField(verbose_name='Email')
+    telegram_username = models.CharField(
+        max_length=100, blank=True, null=True, verbose_name='Telegram',
+        help_text='Аккаунт Telegram, например @username',
+    )
     subject = models.CharField(max_length=200, verbose_name='Тема')
     message = models.TextField(verbose_name='Сообщение')
     is_read = models.BooleanField(default=False, verbose_name='Прочитано')

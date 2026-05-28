@@ -24,12 +24,29 @@
         {% endfor %}
       {% endif %}
 
+      {% if form.non_field_errors %}
+        <div class="alert-banner alert-error">
+          {% for error in form.non_field_errors %}
+            <p>{{ error }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+
       <form class="contact-form" method="post" action="{% url 'pages:contact' %}">
         {% csrf_token %}
+        {{ form.website }}
+        {{ form.form_loaded_at }}
         <input type="text"  name="name"    class="contact-input"    placeholder="Ваше имя"      required
                value="{{ form.name.value|default:'' }}">
         <input type="email" name="email"   class="contact-input"    placeholder="Ваш Email"     required
                value="{{ form.email.value|default:'' }}">
+        <div class="contact-field-wrapper">
+          <input type="text"  name="telegram_username" class="contact-input" placeholder="Telegram (@username)" required
+                 value="{{ form.telegram_username.value|default:'' }}">
+          {% if form.telegram_username.errors %}
+            <span class="field-error">{{ form.telegram_username.errors.0 }}</span>
+          {% endif %}
+        </div>
         <input type="text"  name="subject" class="contact-input"    placeholder="Тема"
                value="{{ form.subject.value|default:'Обращение с сайта' }}">
         <textarea           name="message" class="contact-textarea" placeholder="Ваше сообщение" required

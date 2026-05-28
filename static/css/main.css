@@ -1363,6 +1363,18 @@ body {
     text-decoration: underline;
 }
 
+.contact-field-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.field-error {
+    color: #ff6b6b;
+    font-size: 0.82rem;
+    padding-left: 28px;
+}
+
 .btn-send {
     display: inline-block;
     background: var(--accent);
