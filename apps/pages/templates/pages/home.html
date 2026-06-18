@@ -19,7 +19,9 @@
       <div class="hero-actions">
         <a href="{% url 'pages:contact' %}" class="btn-hire">Нанять меня</a>
         {% if reviews %}
-          <a href="#reviews" class="btn-hero-outline">Отзывы</a>
+          <a href="#reviews" class="btn-hero-outline">
+            <i class="fas fa-star"></i> Отзывы
+          </a>
         {% endif %}
       </div>
 
@@ -61,71 +63,94 @@
       <div class="section-line"></div>
     </div>
 
-    <div class="reviews-slider">
-      <button class="rev-nav rev-prev" id="revPrev" type="button" aria-label="Назад">
+    <div class="reviews-row-wrap">
+      <button class="rev-arrow rev-prev" id="revPrev" type="button" aria-label="Назад">
         <i class="fas fa-chevron-left"></i>
       </button>
 
-      <div class="reviews-viewport" id="reviewsViewport">
-        <div class="reviews-track" id="reviewsTrack">
-          {% for review in reviews %}
-          <article class="review-card">
+      <div class="reviews-row" id="reviewsRow">
+        {% for review in reviews %}
+        <button type="button" class="rev-card" aria-label="Открыть отзыв от {{ review.author_name }}">
 
-            <div class="review-card-head">
+          <div class="rev-card-top">
+            {% if review.rating %}
+              <span class="rev-stars">
+                {% for filled in review.star_list %}<i class="{% if filled %}fas{% else %}far{% endif %} fa-star"></i>{% endfor %}
+              </span>
+            {% else %}<span></span>{% endif %}
+            {% if review.review_date %}<span class="rev-date">{{ review.review_date|date:"d.m.Y" }}</span>{% endif %}
+          </div>
+
+          {% if review.screenshot %}
+            <div class="rev-card-thumb">
+              <img src="{{ review.screenshot.url }}" alt="Отзыв от {{ review.author_name }}" loading="lazy">
+            </div>
+          {% elif review.text %}
+            <p class="rev-card-text">{{ review.text }}</p>
+          {% endif %}
+
+          <div class="rev-card-author">
+            <span class="rev-card-name">{{ review.author_name }}</span>
+            {% if review.author_position %}<span class="rev-card-pos">{{ review.author_position }}</span>{% endif %}
+          </div>
+
+          <span class="rev-card-more">Читать отзыв <i class="fas fa-arrow-right"></i></span>
+
+          <template class="rev-full-tpl">
+            <div class="rev-full-head">
               {% if review.rating %}
-                <div class="review-stars" aria-label="Оценка {{ review.rating }} из 5">
-                  {% for filled in review.star_list %}
-                    <i class="{% if filled %}fas{% else %}far{% endif %} fa-star"></i>
-                  {% endfor %}
-                </div>
-              {% else %}
-                <span></span>
-              {% endif %}
-              {% if review.review_date %}
-                <span class="review-date">{{ review.review_date|date:"d.m.Y" }}</span>
-              {% endif %}
+                <span class="rev-full-stars">
+                  {% for filled in review.star_list %}<i class="{% if filled %}fas{% else %}far{% endif %} fa-star"></i>{% endfor %}
+                </span>
+              {% else %}<span></span>{% endif %}
+              {% if review.review_date %}<span class="rev-full-date">{{ review.review_date|date:"d.m.Y" }}</span>{% endif %}
             </div>
 
             {% if review.screenshot %}
-              <a href="{{ review.screenshot.url }}" target="_blank" rel="noopener noreferrer"
-                 class="review-shot" title="Открыть отзыв полностью">
-                <img src="{{ review.screenshot.url }}"
-                     alt="Отзыв от {{ review.author_name }}" loading="lazy">
+              <a href="{{ review.screenshot.url }}" target="_blank" rel="noopener noreferrer" class="rev-full-shot">
+                <img src="{{ review.screenshot.url }}" alt="Отзыв от {{ review.author_name }}">
               </a>
-            {% elif review.text %}
-              <p class="review-text">{{ review.text|linebreaksbr }}</p>
+            {% endif %}
+            {% if review.text %}
+              <div class="rev-full-text">{{ review.text }}</div>
             {% endif %}
 
-            <div class="review-foot">
-              <div class="review-author">
-                <span class="review-author-name">{{ review.author_name }}</span>
-                {% if review.author_position %}
-                  <span class="review-author-pos">{{ review.author_position }}</span>
-                {% endif %}
+            <div class="rev-full-foot">
+              <div class="rev-full-author">
+                <span class="rev-full-name">{{ review.author_name }}</span>
+                {% if review.author_position %}<span class="rev-full-pos">{{ review.author_position }}</span>{% endif %}
               </div>
               {% if review.project %}
-                <a href="{{ review.project.get_absolute_url }}" class="review-project-link"
-                   title="Перейти к кейсу: {{ review.project.title }}">
-                  <i class="fas fa-up-right-from-square"></i>
+                <a href="{{ review.project.get_absolute_url }}" class="rev-full-project">
+                  <i class="fas fa-arrow-up-right-from-square"></i>
                   <span>{{ review.project.title }}</span>
                 </a>
               {% endif %}
             </div>
+          </template>
 
-          </article>
-          {% endfor %}
-        </div>
+        </button>
+        {% endfor %}
       </div>
 
-      <button class="rev-nav rev-next" id="revNext" type="button" aria-label="Вперёд">
+      <button class="rev-arrow rev-next" id="revNext" type="button" aria-label="Вперёд">
         <i class="fas fa-chevron-right"></i>
       </button>
     </div>
 
-    <div class="reviews-dots" id="reviewsDots"></div>
-
   </div>
 </section>
+
+<!-- Модалка чтения отзыва -->
+<div class="rev-modal" id="revModal" aria-hidden="true">
+  <div class="rev-modal-overlay" id="revModalOverlay"></div>
+  <div class="rev-modal-box" role="dialog" aria-modal="true">
+    <button class="rev-modal-close" id="revModalClose" type="button" aria-label="Закрыть">
+      <i class="fas fa-times"></i>
+    </button>
+    <div class="rev-modal-content" id="revModalContent"></div>
+  </div>
+</div>
 {% endif %}
 {% endblock %}
 
@@ -133,47 +158,71 @@
 {% if reviews %}
 <script>
 (function () {
-  const vp       = document.getElementById('reviewsViewport');
-  const track    = document.getElementById('reviewsTrack');
+  const row      = document.getElementById('reviewsRow');
   const btnPrev  = document.getElementById('revPrev');
   const btnNext  = document.getElementById('revNext');
-  const dotsWrap = document.getElementById('reviewsDots');
-  if (!vp || !track) return;
+  const modal    = document.getElementById('revModal');
+  const overlay  = document.getElementById('revModalOverlay');
+  const closeBtn = document.getElementById('revModalClose');
+  const content  = document.getElementById('revModalContent');
+  if (!row) return;
 
-  const cards = Array.from(track.children);
+  const cards = Array.from(row.querySelectorAll('.rev-card'));
 
   function step() {
-    if (!cards.length) return vp.clientWidth;
-    const gap = parseFloat(getComputedStyle(track).gap) || 0;
+    if (!cards.length) return row.clientWidth;
+    const gap = parseFloat(getComputedStyle(row).gap) || 0;
     return cards[0].getBoundingClientRect().width + gap;
   }
 
-  // Точки навигации — по одной на карточку
-  cards.forEach((_, i) => {
-    const dot = document.createElement('button');
-    dot.type = 'button';
-    dot.className = 'rev-dot';
-    dot.setAttribute('aria-label', 'Отзыв ' + (i + 1));
-    dot.addEventListener('click', () => vp.scrollTo({ left: step() * i, behavior: 'smooth' }));
-    dotsWrap.appendChild(dot);
-  });
-  const dots = Array.from(dotsWrap.children);
+  // ── Стрелки ──
+  if (btnPrev) btnPrev.addEventListener('click', () => row.scrollBy({ left: -step(), behavior: 'smooth' }));
+  if (btnNext) btnNext.addEventListener('click', () => row.scrollBy({ left:  step(), behavior: 'smooth' }));
 
-  function update() {
-    const idx = Math.round(vp.scrollLeft / step());
-    dots.forEach((d, i) => d.classList.toggle('active', i === idx));
-    const atStart = vp.scrollLeft <= 2;
-    const atEnd   = vp.scrollLeft + vp.clientWidth >= track.scrollWidth - 2;
-    btnPrev.classList.toggle('is-disabled', atStart);
-    btnNext.classList.toggle('is-disabled', atEnd);
+  function updateArrows() {
+    if (!btnPrev || !btnNext) return;
+    const atStart = row.scrollLeft <= 2;
+    const atEnd   = row.scrollLeft + row.clientWidth >= row.scrollWidth - 2;
+    btnPrev.classList.toggle('is-hidden', atStart);
+    btnNext.classList.toggle('is-hidden', atEnd);
+  }
+  row.addEventListener('scroll', updateArrows, { passive: true });
+  window.addEventListener('resize', updateArrows);
+  updateArrows();
+
+  // ── Различаем тап и свайп, чтобы свайп не открывал модалку ──
+  let downX = null, moved = false;
+  row.addEventListener('pointerdown', e => { downX = e.clientX; moved = false; });
+  row.addEventListener('pointermove', e => {
+    if (downX !== null && Math.abs(e.clientX - downX) > 8) moved = true;
+  });
+
+  // ── Модалка ──
+  function openModal(card) {
+    const tpl = card.querySelector('.rev-full-tpl');
+    if (!tpl) return;
+    content.innerHTML = '';
+    content.appendChild(tpl.content.cloneNode(true));
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeModal() {
+    modal.classList.remove('open');
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
   }
 
-  btnPrev.addEventListener('click', () => vp.scrollBy({ left: -step(), behavior: 'smooth' }));
-  btnNext.addEventListener('click', () => vp.scrollBy({ left:  step(), behavior: 'smooth' }));
-  vp.addEventListener('scroll', update, { passive: true });
-  window.addEventListener('resize', update);
+  cards.forEach(card => {
+    card.addEventListener('click', () => {
+      if (moved) { moved = false; return; }   // это был свайп
+      openModal(card);
+    });
+  });
 
-  update();
+  overlay.addEventListener('click', closeModal);
+  closeBtn.addEventListener('click', closeModal);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 })();
 </script>
 {% endif %}
