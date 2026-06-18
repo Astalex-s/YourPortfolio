@@ -15,7 +15,13 @@
       <span class="hero-role">
         {% if site_settings %}{{ site_settings.tagline }}{% else %}Backend Developer{% endif %}
       </span>
-      <a href="{% url 'pages:contact' %}" class="btn-hire">Нанять меня</a>
+
+      <div class="hero-actions">
+        <a href="{% url 'pages:contact' %}" class="btn-hire">Нанять меня</a>
+        {% if reviews %}
+          <a href="#reviews" class="btn-hero-outline">Отзывы</a>
+        {% endif %}
+      </div>
 
       {% if site_settings and site_settings.social_links.all %}
         <div class="hero-socials">
@@ -43,4 +49,132 @@
 
   </div>
 </section>
+
+{% if reviews %}
+<!-- ── Отзывы ── -->
+<section class="site-section reviews-section" id="reviews">
+  <div class="section-inner">
+
+    <div class="section-heading">
+      <span class="section-bg-text">ОТЗЫВЫ</span>
+      <p class="section-title">Отзывы</p>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="reviews-slider">
+      <button class="rev-nav rev-prev" id="revPrev" type="button" aria-label="Назад">
+        <i class="fas fa-chevron-left"></i>
+      </button>
+
+      <div class="reviews-viewport" id="reviewsViewport">
+        <div class="reviews-track" id="reviewsTrack">
+          {% for review in reviews %}
+          <article class="review-card">
+
+            <div class="review-card-head">
+              {% if review.rating %}
+                <div class="review-stars" aria-label="Оценка {{ review.rating }} из 5">
+                  {% for filled in review.star_list %}
+                    <i class="{% if filled %}fas{% else %}far{% endif %} fa-star"></i>
+                  {% endfor %}
+                </div>
+              {% else %}
+                <span></span>
+              {% endif %}
+              {% if review.review_date %}
+                <span class="review-date">{{ review.review_date|date:"d.m.Y" }}</span>
+              {% endif %}
+            </div>
+
+            {% if review.screenshot %}
+              <a href="{{ review.screenshot.url }}" target="_blank" rel="noopener noreferrer"
+                 class="review-shot" title="Открыть отзыв полностью">
+                <img src="{{ review.screenshot.url }}"
+                     alt="Отзыв от {{ review.author_name }}" loading="lazy">
+              </a>
+            {% elif review.text %}
+              <p class="review-text">{{ review.text|linebreaksbr }}</p>
+            {% endif %}
+
+            <div class="review-foot">
+              <div class="review-author">
+                <span class="review-author-name">{{ review.author_name }}</span>
+                {% if review.author_position %}
+                  <span class="review-author-pos">{{ review.author_position }}</span>
+                {% endif %}
+              </div>
+              {% if review.project %}
+                <a href="{{ review.project.get_absolute_url }}" class="review-project-link"
+                   title="Перейти к кейсу: {{ review.project.title }}">
+                  <i class="fas fa-up-right-from-square"></i>
+                  <span>{{ review.project.title }}</span>
+                </a>
+              {% endif %}
+            </div>
+
+          </article>
+          {% endfor %}
+        </div>
+      </div>
+
+      <button class="rev-nav rev-next" id="revNext" type="button" aria-label="Вперёд">
+        <i class="fas fa-chevron-right"></i>
+      </button>
+    </div>
+
+    <div class="reviews-dots" id="reviewsDots"></div>
+
+  </div>
+</section>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+{% if reviews %}
+<script>
+(function () {
+  const vp       = document.getElementById('reviewsViewport');
+  const track    = document.getElementById('reviewsTrack');
+  const btnPrev  = document.getElementById('revPrev');
+  const btnNext  = document.getElementById('revNext');
+  const dotsWrap = document.getElementById('reviewsDots');
+  if (!vp || !track) return;
+
+  const cards = Array.from(track.children);
+
+  function step() {
+    if (!cards.length) return vp.clientWidth;
+    const gap = parseFloat(getComputedStyle(track).gap) || 0;
+    return cards[0].getBoundingClientRect().width + gap;
+  }
+
+  // Точки навигации — по одной на карточку
+  cards.forEach((_, i) => {
+    const dot = document.createElement('button');
+    dot.type = 'button';
+    dot.className = 'rev-dot';
+    dot.setAttribute('aria-label', 'Отзыв ' + (i + 1));
+    dot.addEventListener('click', () => vp.scrollTo({ left: step() * i, behavior: 'smooth' }));
+    dotsWrap.appendChild(dot);
+  });
+  const dots = Array.from(dotsWrap.children);
+
+  function update() {
+    const idx = Math.round(vp.scrollLeft / step());
+    dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+    const atStart = vp.scrollLeft <= 2;
+    const atEnd   = vp.scrollLeft + vp.clientWidth >= track.scrollWidth - 2;
+    btnPrev.classList.toggle('is-disabled', atStart);
+    btnNext.classList.toggle('is-disabled', atEnd);
+  }
+
+  btnPrev.addEventListener('click', () => vp.scrollBy({ left: -step(), behavior: 'smooth' }));
+  btnNext.addEventListener('click', () => vp.scrollBy({ left:  step(), behavior: 'smooth' }));
+  vp.addEventListener('scroll', update, { passive: true });
+  window.addEventListener('resize', update);
+
+  update();
+})();
+</script>
+{% endif %}
 {% endblock %}

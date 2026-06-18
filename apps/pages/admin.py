@@ -1,5 +1,8 @@
 from django.contrib import admin
-from .models import SiteSettings, SocialLink, ContactMessage, Certificate, Education, WorkExperience
+from .models import (
+    SiteSettings, SocialLink, ContactMessage, Certificate,
+    Education, WorkExperience, Review,
+)
 
 
 class SocialLinkInline(admin.TabularInline):
@@ -26,9 +29,20 @@ class WorkExperienceInline(admin.TabularInline):
     fields = ['position', 'company', 'period', 'description', 'order']
 
 
+class ReviewInline(admin.StackedInline):
+    model = Review
+    extra = 1
+    autocomplete_fields = ['project']
+    fields = [
+        'author_name', 'author_position', 'project',
+        'screenshot', 'text', 'rating', 'review_date',
+        'order', 'is_published',
+    ]
+
+
 @admin.register(SiteSettings)
 class SiteSettingsAdmin(admin.ModelAdmin):
-    inlines = [SocialLinkInline, CertificateInline, EducationInline, WorkExperienceInline]
+    inlines = [SocialLinkInline, CertificateInline, EducationInline, WorkExperienceInline, ReviewInline]
     fieldsets = (
         ('Личная информация', {
             'fields': ('owner_name', 'tagline', 'about_text', 'logo', 'avatar', 'about_photo')

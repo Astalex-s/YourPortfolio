@@ -132,6 +132,55 @@ class WorkExperience(TimeStampedModel):
         return f'{self.position} — {self.company}'
 
 
+class Review(TimeStampedModel):
+    site_settings = models.ForeignKey(
+        SiteSettings, related_name='reviews',
+        on_delete=models.CASCADE, verbose_name='Настройки'
+    )
+    author_name = models.CharField(max_length=100, verbose_name='Имя автора')
+    author_position = models.CharField(
+        max_length=200, blank=True, verbose_name='Должность / компания',
+        help_text='Например: CEO, Acme Inc. (опционально)'
+    )
+    project = models.ForeignKey(
+        'portfolio.Project', related_name='reviews',
+        on_delete=models.SET_NULL, blank=True, null=True,
+        verbose_name='Проект (кейс на сайте)',
+        help_text='Если указан — в карточке появится ссылка на страницу проекта'
+    )
+    screenshot = models.ImageField(
+        upload_to='pages/reviews/', blank=True, null=True,
+        verbose_name='Скриншот отзыва'
+    )
+    text = models.TextField(
+        blank=True, verbose_name='Текст отзыва',
+        help_text='Опционально — показывается, если нет скриншота'
+    )
+    rating = models.PositiveSmallIntegerField(
+        default=5, choices=[(i, str(i)) for i in range(0, 6)],
+        verbose_name='Оценка (звёзды)',
+        help_text='От 0 до 5. 0 — не показывать звёзды'
+    )
+    review_date = models.DateField(
+        blank=True, null=True, verbose_name='Дата отзыва'
+    )
+    order = models.PositiveSmallIntegerField(default=0, verbose_name='Порядок')
+    is_published = models.BooleanField(default=True, verbose_name='Опубликован')
+
+    class Meta:
+        verbose_name = 'Отзыв'
+        verbose_name_plural = 'Отзывы'
+        ordering = ['order', '-review_date', '-created_at']
+
+    def __str__(self):
+        return f'Отзыв — {self.author_name}'
+
+    @property
+    def star_list(self):
+        """Список из 5 булевых: True — заполненная звезда, False — пустая."""
+        return [i < self.rating for i in range(5)]
+
+
 class ContactMessage(TimeStampedModel):
     name = models.CharField(max_length=100, verbose_name='Имя')
     email = models.EmailField(verbose_name='Email')

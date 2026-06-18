@@ -12,7 +12,7 @@ from django.conf import settings
 logger = logging.getLogger(__name__)
 
 from apps.portfolio.models import Project
-from .models import SiteSettings
+from .models import SiteSettings, Review
 from .forms import ContactForm
 
 DEFAULT_SKILLS = [
@@ -33,6 +33,9 @@ class HomeView(TemplateView):
         ctx['featured_projects'] = Project.objects.filter(
             is_published=True, is_featured=True
         ).prefetch_related('tech_stack')[:6]
+        ctx['reviews'] = Review.objects.filter(
+            is_published=True
+        ).select_related('project')
         return ctx
 
 
