@@ -18,6 +18,8 @@ docker run --rm \
   -v /etc/letsencrypt:/etc/letsencrypt \
   certbot/certbot certonly \
   --standalone \
+  --non-interactive \
+  --keep-until-expiring \
   -d "$DOMAIN" \
   -d "www.$DOMAIN" \
   --email "$EMAIL" \
