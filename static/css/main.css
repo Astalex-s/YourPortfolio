@@ -1470,6 +1470,21 @@ body {
     color: var(--accent);
 }
 
+.footer-legal {
+    max-width: 1200px;
+    margin: 16px auto 0;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    text-align: center;
+}
+
+.footer-legal p {
+    font-size: 0.72rem;
+    line-height: 1.5;
+    color: var(--text-muted);
+    margin: 2px 0;
+}
+
 /* ============================================
    Skill tags (for about section)
    ============================================ */
