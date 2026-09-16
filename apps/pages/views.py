@@ -52,6 +52,10 @@ class ServicesView(TemplateView):
     template_name = 'pages/services.html'
 
 
+class PrivacyPolicyView(TemplateView):
+    template_name = 'pages/privacy.html'
+
+
 class ResumeView(TemplateView):
     template_name = 'pages/resume.html'
 
