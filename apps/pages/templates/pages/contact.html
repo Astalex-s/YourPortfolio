@@ -53,7 +53,7 @@
                   rows="4">{{ form.message.value|default:'' }}</textarea>
         <label class="contact-check">
           <input type="checkbox" required>
-          Я согласен на обработку <a href="#">персональных данных</a>
+          Я согласен на обработку <a href="{% url 'pages:privacy' %}" target="_blank" rel="noopener noreferrer">персональных данных</a>
         </label>
         <button type="submit" class="btn-send">Отправить</button>
       </form>

@@ -1513,14 +1513,6 @@ body {
     margin: 2px 0;
 }
 
-.footer-legal a {
-    color: var(--text-muted);
-    text-decoration: underline;
-}
-
-.footer-legal a:hover {
-    color: var(--accent);
-}
 
 /* ============================================
    Skill tags (for about section)
